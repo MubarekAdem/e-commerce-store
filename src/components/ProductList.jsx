@@ -18,6 +18,15 @@ export default function ProductList() {
     fetchProducts();
   }, []);
 
+  const deleteProduct = async (id) => {
+    try {
+      await axios.delete(`/api/products/${id}`);
+      setProducts(products.filter((product) => product._id !== id));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <div className={styles["product-list"]}>
       {products.map((product) => (
@@ -27,6 +36,12 @@ export default function ProductList() {
             <h2>{product.name}</h2>
             <p>{product.description}</p>
             <div className={styles["price"]}>${product.price}</div>
+            <button
+              className={styles["delete-button"]}
+              onClick={() => deleteProduct(product._id)}
+            >
+              Delete
+            </button>
           </div>
         </div>
       ))}

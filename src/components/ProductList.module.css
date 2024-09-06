@@ -1,4 +1,3 @@
-/* Product List Styles */
 .product-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -42,4 +41,21 @@
   font-size: 1.1em;
   font-weight: bold;
   margin: 10px 0;
+}
+
+.delete-button {
+  background: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  margin-top: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.delete-button:hover {
+  background: #ff1a1a;
 }
