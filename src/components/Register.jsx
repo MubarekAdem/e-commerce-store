@@ -1,0 +1,60 @@
+import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import styles from "../components/Form.module.css"; // Import your form styling
+import Navbar from "./Navbar"; // Import your Navbar component
+
+export default function Register() {
+  const { register } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await register(name, email, password); // Ensure all fields are passed
+      alert("Registration successful");
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+
+  return (
+    <>
+      <Navbar />
+      <div className={styles.formContainer}>
+        <h1>Register</h1>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <label>
+            Email:
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Name:
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Password:
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </>
+  );
+}
