@@ -1,16 +1,21 @@
-import ProductList from "../components/ProductList";
-import Navbar from "../components/Navbar";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useAuth } from "../contexts/AuthContext";
 
-import AddProduct from "../components/AddProduct";
-import Link from "next/link";
-export default function Home() {
+export default function HomePage() {
+  const { currentUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (currentUser) {
+      router.push("/add-product"); // Redirect to add product page after login
+    }
+  }, [currentUser]);
+
   return (
     <div>
-      <Navbar />
       <h1>Welcome to the E-commerce Store</h1>
-      <AddProduct />
-      <ProductList />
-      <Link href="/register">Register</Link> | <Link href="/login">Login</Link>
+      <p>Please log in to access your products.</p>
     </div>
   );
 }

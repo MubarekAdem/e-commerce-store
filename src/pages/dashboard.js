@@ -1,16 +1,31 @@
-import { useContext, useEffect } from "react";
-import AuthContext from "../contexts/AuthContext";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../contexts/AuthContext";
+import AddProduct from "../components/AddProduct";
+import ProductList from "../components/ProductList";
 
-export default function Dashboard() {
-  const { user } = useContext(AuthContext);
+const Dashboard = () => {
+  const { currentUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!currentUser) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [currentUser, router]);
 
-  return user ? <div>Welcome to the Dashboard, {user.name}!</div> : null;
-}
+  if (!currentUser) {
+    return <p>Loading...</p>; // Show loading or placeholder while redirecting
+  }
+
+  return (
+    <div>
+      <h1>Welcome to the Dashboard</h1>
+      <p>This is a protected page that only logged-in users should see.</p>
+      <AddProduct />
+      <ProductList />
+    </div>
+  );
+};
+
+export default Dashboard;

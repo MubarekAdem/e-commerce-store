@@ -1,11 +1,21 @@
+// src/pages/productlist.js
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/router";
 import axios from "axios";
-import styles from "./ProductList.module.css"; // Ensure this path is correct
+import styles from "./ProductList.module.css";
 
 export default function ProductList() {
+  const { currentUser, logout } = useAuth();
   const [products, setProducts] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
+    if (!currentUser) {
+      router.push("/login");
+      return;
+    }
+
     async function fetchProducts() {
       try {
         const response = await axios.get("/api/products");
@@ -16,7 +26,11 @@ export default function ProductList() {
     }
 
     fetchProducts();
-  }, []);
+  }, [currentUser, router]);
+
+  if (!currentUser) {
+    return <div>Loading...</div>; // Loading state
+  }
 
   const deleteProduct = async (id) => {
     try {
