@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
 import axios from "axios";
 import styles from "./ProductList.module.css";
+import Navbar from "./Navbar";
 
 export default function ProductList() {
   const { currentUser, logout } = useAuth();
@@ -29,20 +30,12 @@ export default function ProductList() {
   }, [currentUser, router]);
 
   if (!currentUser) {
-    return <div>Loading...</div>; // Loading state
+    return <div>Loading...</div>;
   }
 
-  const deleteProduct = async (id) => {
-    try {
-      await axios.delete(`/api/products/${id}`);
-      setProducts(products.filter((product) => product._id !== id));
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
-
   return (
-    <div className={styles["product-list"]}>
+    <div>
+      <Navbar /> {/* Add Navbar here */}
       {products.map((product) => (
         <div key={product._id} className={styles["product-card"]}>
           <img src={product.imageUrl} alt={product.name} />

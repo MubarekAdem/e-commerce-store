@@ -1,21 +1,32 @@
-// src/components/Navbar.js
-import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
+import { useAuth } from "../contexts/AuthContext";
+import styles from "./Navbar.module.css"; // Import your CSS module for styling
 
-export default function Navbar() {
-  const { currentUser, logout } = useAuth();
+const Navbar = () => {
+  const { logout } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login"); // Redirect to login page after logout
   };
 
   return (
-    <nav>
-      <a href="/productlist">Product List</a>
-      {currentUser?.role === "admin" && <a href="/addproduct">Add Product</a>}
-      <button onClick={handleLogout}>Logout</button>
+    <nav className={styles.navbar}>
+      <ul>
+        <li>
+          <a href="/dashboard">Dashboard</a>
+        </li>
+        <li>
+          <a href="/productlist">Product List</a>
+        </li>
+        {/* Add more navigation links as needed */}
+        <li>
+          <button onClick={handleLogout}>Logout</button>
+        </li>
+      </ul>
     </nav>
   );
-}
+};
+
+export default Navbar;
