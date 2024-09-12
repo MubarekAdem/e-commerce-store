@@ -32,7 +32,7 @@ export default async function handler(req, res) {
             isInstructor: user.isInstructor,
           },
           "Mubarek@12",
-          { expiresIn: "1h" }
+          { expiresIn: "10y" }
         );
 
         // Determine the redirect URL based on the user's role

@@ -50,12 +50,14 @@ export default function ProductList() {
             <h2>{product.name}</h2>
             <p>{product.description}</p>
             <div className={styles["price"]}>${product.price}</div>
-            <button
-              className={styles["delete-button"]}
-              onClick={() => deleteProduct(product._id)}
-            >
-              Delete
-            </button>
+            {currentUser.role === "admin" && (
+              <button
+                className={styles["delete-button"]}
+                onClick={() => deleteProduct(product._id)}
+              >
+                Delete
+              </button>
+            )}
           </div>
         </div>
       ))}

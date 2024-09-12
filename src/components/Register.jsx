@@ -8,11 +8,13 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("customer"); // Default to "customer"
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(name, email, password); // Ensure all fields are passed
+      // Pass the selected role along with the name, email, and password
+      await register(name, email, password, role);
       alert("Registration successful");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -51,6 +53,17 @@ export default function Register() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </label>
+          <label>
+            Role:
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="customer">Customer</option>
+              <option value="admin">Admin</option>
+            </select>
           </label>
           <button type="submit">Register</button>
         </form>

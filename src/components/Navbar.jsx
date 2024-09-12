@@ -1,20 +1,21 @@
-import Link from "next/link";
-import styles from "./Navbar.module.css"; // Add your CSS module for styling
+// src/components/Navbar.js
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
+  const { currentUser, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
   return (
-    <nav className={styles.navbar}>
-      <ul className={styles.navList}>
-        <li className={styles.navItem}>
-          <Link href="/">Home</Link>
-        </li>
-        <li className={styles.navItem}>
-          <Link href="/register">Register</Link>
-        </li>
-        <li className={styles.navItem}>
-          <Link href="/login">Login</Link>
-        </li>
-      </ul>
+    <nav>
+      <a href="/productlist">Product List</a>
+      {currentUser?.role === "admin" && <a href="/addproduct">Add Product</a>}
+      <button onClick={handleLogout}>Logout</button>
     </nav>
   );
 }

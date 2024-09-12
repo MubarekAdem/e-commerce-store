@@ -7,6 +7,7 @@ export default function Register() {
     name: "",
     email: "",
     password: "",
+    role: "customer", // Default role set to 'customer'
   });
   const router = useRouter();
 
@@ -38,6 +39,7 @@ export default function Register() {
           placeholder="Name"
           value={formData.name}
           onChange={handleChange}
+          required
         />
         <input
           type="email"
@@ -45,6 +47,7 @@ export default function Register() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
+          required
         />
         <input
           type="password"
@@ -52,7 +55,17 @@ export default function Register() {
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
+          required
         />
+        <select
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          required
+        >
+          <option value="customer">Customer</option>
+          <option value="admin">Admin</option>
+        </select>
         <button type="submit">Register</button>
       </form>
     </div>
