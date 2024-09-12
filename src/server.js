@@ -11,10 +11,13 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
-mongoose.connect("your_mongodb_connection_string", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  "mongodb+srv://inventoryDB:12345@cluster0.qnkphxn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 server.all("*", (req, res) => {
   return handle(req, res);

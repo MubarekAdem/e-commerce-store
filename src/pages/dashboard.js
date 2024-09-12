@@ -10,17 +10,21 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      router.push("/login");
+      // Only redirect if currentUser is explicitly null (not undefined)
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+      }
     }
   }, [currentUser, router]);
 
   if (!currentUser) {
-    return <p>Loading...</p>; // Show loading or placeholder while redirecting
+    return <p>Loading...</p>; // Show loading or placeholder while fetching user data
   }
 
   return (
     <div>
-      <h1>Welcome to the Dashboard</h1>
+      <h1>Welcome to the Dashboard, {currentUser.name}</h1>
       <p>This is a protected page that only logged-in users should see.</p>
       <AddProduct />
       <ProductList />
