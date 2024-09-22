@@ -13,7 +13,7 @@ const ProductList = () => {
       try {
         const response = await axios.get("/api/products");
         setProducts(response.data);
-        console.log(response.data); // Inside fetchProducts
+        console.log(response.data); // Log fetched products
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -28,8 +28,11 @@ const ProductList = () => {
 
   const deleteProduct = async (productId) => {
     try {
-      await axios.delete(`/api/products/${productId}`);
-      setProducts(products.filter((product) => product._id !== productId));
+      const response = await axios.delete(`/api/products/${productId}`);
+      console.log("Delete response:", response.data);
+      setProducts(
+        products.filter((product) => product._id.toString() !== productId)
+      );
     } catch (error) {
       console.error("Error deleting product:", error);
     }

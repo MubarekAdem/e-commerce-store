@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
@@ -13,7 +14,9 @@ const ProductSchema = new mongoose.Schema({
     },
   ], // Add variants for products
   categories: [String], // Optional categories
-  supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" }, // Reference to Supplier model
+  // supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" }, // Reference to Supplier model
 });
+
+// Export the Product model only if it hasn't been compiled yet
 module.exports =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);
