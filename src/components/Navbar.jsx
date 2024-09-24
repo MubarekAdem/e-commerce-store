@@ -24,7 +24,11 @@ const Navbar = () => {
             Product List
           </a>
         </li>
-        {/* Add more navigation links as needed */}
+        <li>
+          <a href="/bulk-upload" className="hover:text-gray-300">
+            Bulk Upload
+          </a>
+        </li>
         <li>
           <button
             onClick={handleLogout}
