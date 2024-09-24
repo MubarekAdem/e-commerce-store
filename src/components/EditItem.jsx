@@ -56,7 +56,7 @@ const EditItem = ({ productId }) => {
     setLoading(true);
     try {
       await axios.put(`/api/products/${productId}`, product);
-      router.push("/product-list");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error updating product:", error);
     } finally {

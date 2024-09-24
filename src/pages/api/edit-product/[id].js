@@ -1,3 +1,4 @@
+// File: pages/api/edit-product/[id].js
 import Product from "../../../models/Product";
 import dbConnect from "../../../utils/dbConnect";
 
@@ -43,26 +44,8 @@ export default async function handler(req, res) {
       }
       break;
 
-    case "DELETE":
-      try {
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
-          return res
-            .status(404)
-            .json({ success: false, message: "Product not found" });
-        }
-        res
-          .status(200)
-          .json({ success: true, message: "Product deleted successfully" });
-      } catch (error) {
-        res
-          .status(400)
-          .json({ success: false, message: "Error deleting product" });
-      }
-      break;
-
     default:
-      res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
+      res.setHeader("Allow", ["GET", "PUT"]);
       res.status(405).end(`Method ${method} Not Allowed`);
       break;
   }

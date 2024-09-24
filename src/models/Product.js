@@ -1,22 +1,24 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const ProductSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: String,
   description: String,
-  price: { type: Number, required: true },
+  price: Number,
   imageUrl: String,
-  stock: { type: Number, default: 0 }, // Add stock tracking
+  stock: Number,
   variants: [
     {
       size: String,
       color: String,
       stock: Number,
     },
-  ], // Add variants for products
-  categories: [String], // Optional categories
-  // supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" }, // Reference to Supplier model
+  ],
+  categories: [String],
 });
 
-// Export the Product model only if it hasn't been compiled yet
-module.exports =
-  mongoose.models.Product || mongoose.model("Product", ProductSchema);
+// Avoid recompiling the model
+if (!mongoose.models.Product) {
+  mongoose.model("Product", ProductSchema);
+}
+
+module.exports = mongoose.models.Product || mongoose.model("Product");
