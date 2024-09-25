@@ -13,6 +13,7 @@ export const config = {
 const handler = async (req, res) => {
   if (req.method === "POST") {
     await dbConnect();
+    console.log("Database connected");
 
     const form = formidable();
 
@@ -30,6 +31,8 @@ const handler = async (req, res) => {
         }
 
         const filePath = file[0].filepath;
+        console.log("File path:", filePath);
+
         const workbook = XLSX.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
@@ -42,6 +45,13 @@ const handler = async (req, res) => {
         // Process each item and save to the database
         for (let i = 1; i < data.length; i++) {
           const item = data[i];
+          console.log("Processing item:", item);
+
+          // Ensure that we have valid data
+          if (item.length < 7) {
+            console.warn(`Skipping row ${i + 1}: Not enough data`, item);
+            continue; // Skip if there are not enough fields
+          }
 
           const product = new Product({
             name: item[0] || "",
@@ -49,11 +59,12 @@ const handler = async (req, res) => {
             price: item[2] || 0,
             imageUrl: item[3] || "",
             stock: item[4] || 0,
-            variants: item[5] ? JSON.parse(item[5]) : [],
-            categories: item[6] ? JSON.parse(item[6]) : [],
+            // Ensure proper parsing of JSON strings
+            variants: item[5] ? JSON.parse(item[5].replace(/\\/g, "")) : [],
+            categories: item[6] ? JSON.parse(item[6].replace(/\\/g, "")) : [],
           });
 
-          console.log("Product Object:", product);
+          console.log("Product Object Before Save:", product);
 
           try {
             const savedProduct = await product.save();
@@ -67,7 +78,9 @@ const handler = async (req, res) => {
           }
         }
 
-        // Send saved products to /api/products
+        // Sending saved products to /api/products if needed
+        console.log("Saved Products to send:", savedProducts);
+
         try {
           const response = await axios.post(
             "http://localhost:3000/api/products",

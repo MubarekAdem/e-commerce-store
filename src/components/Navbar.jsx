@@ -1,15 +1,19 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext"; // Use the Cart context
 import { useRouter } from "next/router";
 
 const Navbar = () => {
   const { logout } = useAuth();
+  const { cart } = useCart(); // Get the cart context
   const router = useRouter();
 
   const handleLogout = async () => {
     await logout();
     router.push("/login"); // Redirect to login page after logout
   };
+
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0); // Calculate total items in cart
 
   return (
     <nav className="bg-gray-800 text-white p-4">
@@ -30,10 +34,12 @@ const Navbar = () => {
           </a>
         </li>
         <li>
-          <button
-            onClick={handleLogout}
-            className="hover:text-gray-300 focus:outline-none"
-          >
+          <a href="/cart" className="hover:text-gray-300">
+            Cart ({totalItems}) {/* Display total items in cart */}
+          </a>
+        </li>
+        <li>
+          <button onClick={handleLogout} className="hover:text-gray-300">
             Logout
           </button>
         </li>

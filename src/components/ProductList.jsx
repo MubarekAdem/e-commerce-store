@@ -1,10 +1,13 @@
+// components/ProductList.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext"; // Import Cart Context
 import { useRouter } from "next/router";
 import axios from "axios";
 
 const ProductList = () => {
   const { currentUser } = useAuth();
+  const { addToCart } = useCart(); // Get addToCart function
   const [products, setProducts] = useState([]);
   const router = useRouter();
 
@@ -35,6 +38,34 @@ const ProductList = () => {
       );
     } catch (error) {
       console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleAddToCart = async (productId) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Token:", token); // Confirm that token is logged correctly
+
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await axios.post(
+        "http://localhost:3000/api/cart",
+        { productId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Ensure this is correct
+          },
+        }
+      );
+
+      console.log("Added to cart:", response.data);
+    } catch (error) {
+      console.error(
+        "Error adding to cart:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
@@ -86,7 +117,7 @@ const ProductList = () => {
                   )}
 
                 <div className="mt-4 flex justify-between">
-                  {currentUser.role === "admin" && (
+                  {currentUser.role === "admin" ? (
                     <>
                       <button
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -103,6 +134,13 @@ const ProductList = () => {
                         Delete
                       </button>
                     </>
+                  ) : (
+                    <button
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                      onClick={() => handleAddToCart(product)} // Use the new function here
+                    >
+                      Add to Cart
+                    </button>
                   )}
                 </div>
               </div>
