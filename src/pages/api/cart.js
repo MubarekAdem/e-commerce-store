@@ -1,49 +1,96 @@
-import dbConnect from "../../utils/dbConnect"; // Ensure correct import
-import Cart from "../../models/Cart"; // Ensure Cart model is imported
+// pages/api/cart.js
+import dbConnect from "../../utils/dbConnect";
+import Cart from "../../models/Cart";
+import Product from "../../models/Product"; // Import your Product model
+import jwt from "jsonwebtoken";
 
 const handler = async (req, res) => {
   await dbConnect();
 
-  // Assuming you have some mechanism to get the userId, e.g., from JWT token
-  const userId = req.user?.id; // Get userId from the authenticated user context
+  // Check the Authorization header
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
 
-  if (req.method === "POST") {
-    const { productId } = req.body;
+  const token = authHeader.split(" ")[1]; // Extract Bearer token
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
 
+  try {
+    // Verify the token using the same secret used to sign it
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId; // Extract userId from the decoded token
     if (!userId) {
-      return res.status(401).json({ message: "User not authenticated" });
+      return res.status(401).json({ message: "Invalid token" });
     }
 
-    // Find or create the cart for the user
-    let cart = await Cart.findOne({ userId });
-    if (!cart) {
-      cart = new Cart({
-        userId,
-        items: [{ productId, quantity: 1 }],
-      });
+    if (req.method === "GET") {
+      // Fetch the user's cart
+      const cart = await Cart.findOne({ userId });
+      if (!cart) {
+        return res.status(404).json({ message: "Cart not found" });
+      }
+      return res.status(200).json(cart);
+    }
+
+    if (req.method === "POST") {
+      const { productId } = req.body;
+
+      // Fetch product details from the Product model
+      const product = await Product.findById(productId);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      // Find or create the user's cart
+      let cart = await Cart.findOne({ userId });
+      if (!cart) {
+        cart = new Cart({
+          userId,
+          items: [
+            {
+              productId,
+              name: product.name,
+              description: product.description,
+              price: product.price,
+              quantity: 1,
+            },
+          ],
+        });
+        await cart.save();
+        return res.status(201).json({ message: "Cart created", product });
+      }
+
+      // Check if the product already exists in the cart
+      const existingProduct = cart.items.find(
+        (item) => item.productId.toString() === productId
+      );
+      if (existingProduct) {
+        existingProduct.quantity += 1; // Increase quantity if product exists
+      } else {
+        // Add new product with full details
+        cart.items.push({
+          productId,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          quantity: 1,
+        });
+      }
+
       await cart.save();
       return res
-        .status(201)
-        .json({ message: "Cart created", product: { productId } });
-    }
-
-    // Check if product exists in cart and update
-    const existingProduct = cart.items.find(
-      (item) => item.productId.toString() === productId
-    );
-    if (existingProduct) {
-      existingProduct.quantity += 1; // Update quantity
+        .status(200)
+        .json({ message: "Product added to cart", product });
     } else {
-      cart.items.push({ productId, quantity: 1 }); // Add new product
+      res.setHeader("Allow", ["GET", "POST"]);
+      return res.status(405).end(`Method ${req.method} Not Allowed`);
     }
-
-    await cart.save();
-    return res
-      .status(200)
-      .json({ message: "Product added to cart", product: { productId } });
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  } catch (error) {
+    console.error("Error verifying token or cart operation:", error);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 

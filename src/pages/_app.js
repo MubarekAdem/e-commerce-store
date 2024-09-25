@@ -4,11 +4,11 @@ import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
   return (
-    <CartProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <CartProvider>
         <Component {...pageProps} />
-      </AuthProvider>
-    </CartProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

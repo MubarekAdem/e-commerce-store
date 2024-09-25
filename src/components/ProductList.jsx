@@ -43,28 +43,27 @@ const ProductList = () => {
 
   const handleAddToCart = async (productId) => {
     try {
-      const token = localStorage.getItem("token");
-      console.log("Token:", token); // Confirm that token is logged correctly
-
+      const token = localStorage.getItem("token"); // Get the token from local storage
       if (!token) {
         throw new Error("User not authenticated");
       }
 
+      // Make sure the Authorization header is correctly set
       const response = await axios.post(
         "http://localhost:3000/api/cart",
         { productId },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Ensure this is correct
+            Authorization: `Bearer ${token}`, // Passing token correctly in the header
           },
         }
       );
 
-      console.log("Added to cart:", response.data);
+      console.log("Product added to cart:", response.data);
     } catch (error) {
       console.error(
         "Error adding to cart:",
-        error.response ? error.response.data : error.message
+        error.response?.data || error.message
       );
     }
   };

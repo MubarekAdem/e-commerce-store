@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext"; // Use the Cart context
+import { useCart } from "../contexts/CartContext";
 import { useRouter } from "next/router";
 
 const Navbar = () => {
@@ -13,7 +13,8 @@ const Navbar = () => {
     router.push("/login"); // Redirect to login page after logout
   };
 
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0); // Calculate total items in cart
+  // If you're just counting the number of items in the cart (assuming no quantity field)
+  const totalItems = cart.length;
 
   return (
     <nav className="bg-gray-800 text-white p-4">

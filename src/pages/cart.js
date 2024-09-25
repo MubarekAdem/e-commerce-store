@@ -1,4 +1,4 @@
-// pages/cart.js
+// src/pages/cart.js
 import React from "react";
 import { useCart } from "../contexts/CartContext";
 
@@ -20,14 +20,22 @@ const Cart = () => {
               <div>
                 <h2 className="text-lg font-semibold">{item.name}</h2>
                 <p>Price: ${item.price}</p>
-                <p>Quantity: {item.quantity}</p>
+                <p>Description: {item.description}</p>
               </div>
-              <button onClick={() => removeFromCart(item.productId)}>
+              <button
+                onClick={() => removeFromCart(item.productId)} // This should work if everything is set correctly
+                className="bg-red-500 text-white p-2 rounded"
+              >
                 Remove
               </button>
             </div>
           ))}
-          <button onClick={clearCart}>Clear Cart</button>
+          <button
+            onClick={clearCart}
+            className="bg-blue-500 text-white p-2 rounded mt-4"
+          >
+            Clear Cart
+          </button>
         </div>
       )}
     </div>
