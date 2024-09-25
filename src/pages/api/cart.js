@@ -84,8 +84,41 @@ const handler = async (req, res) => {
       return res
         .status(200)
         .json({ message: "Product added to cart", product });
+    }
+
+    if (req.method === "DELETE") {
+      const { productId } = req.body; // Get productId from request body
+
+      // Find the user's cart
+      const cart = await Cart.findOne({ userId });
+      if (!cart) {
+        return res.status(404).json({ message: "Cart not found" });
+      }
+
+      // Find the product in the cart
+      const itemIndex = cart.items.findIndex(
+        (item) => item.productId.toString() === productId
+      );
+
+      if (itemIndex === -1) {
+        return res.status(404).json({ message: "Product not found in cart" });
+      }
+
+      // Check if the item quantity is greater than 1
+      if (cart.items[itemIndex].quantity > 1) {
+        // Decrease the quantity by 1
+        cart.items[itemIndex].quantity -= 1;
+      } else {
+        // Remove the item completely if the quantity is 1
+        cart.items.splice(itemIndex, 1);
+      }
+
+      await cart.save();
+      return res
+        .status(200)
+        .json({ message: "Product removed from cart", items: cart.items });
     } else {
-      res.setHeader("Allow", ["GET", "POST"]);
+      res.setHeader("Allow", ["GET", "POST", "DELETE"]);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
