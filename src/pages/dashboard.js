@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import AddProduct from "../components/AddProduct";
 import ProductList from "../components/ProductList";
+import Orders from "../components/Orders"; // Import Orders component
 import SearchBar from "@/components/SearchBar";
 
 const Dashboard = () => {
@@ -33,12 +34,20 @@ const Dashboard = () => {
 
   return (
     <div>
-      <Navbar /> {/* Add Navbar here */}
+      <Navbar />
       <form onSubmit={handleSearch} className="mb-4">
         <SearchBar />
       </form>
       <p>This is a protected page that only logged-in users should see.</p>
-      <AddProduct />
+
+      {currentUser.role === "admin" && (
+        <>
+          <h2>Admin Dashboard</h2>
+          <AddProduct />
+          <Orders /> {/* Show Orders component for Admin */}
+        </>
+      )}
+
       <ProductList />
     </div>
   );

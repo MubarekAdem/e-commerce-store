@@ -1,4 +1,3 @@
-// pages/api/cart.js
 import dbConnect from "../../utils/dbConnect";
 import Cart from "../../models/Cart";
 import Product from "../../models/Product"; // Import your Product model
@@ -36,7 +35,7 @@ const handler = async (req, res) => {
     }
 
     if (req.method === "POST") {
-      const { productId } = req.body;
+      const { productId, paid = true } = req.body; // Set paid to true by default
 
       // Fetch product details from the Product model
       const product = await Product.findById(productId);
@@ -56,6 +55,7 @@ const handler = async (req, res) => {
               description: product.description,
               price: product.price,
               quantity: 1,
+              paid, // Use the paid status from the request body
             },
           ],
         });
@@ -69,6 +69,7 @@ const handler = async (req, res) => {
       );
       if (existingProduct) {
         existingProduct.quantity += 1; // Increase quantity if product exists
+        existingProduct.paid = true; // Ensure the existing product is marked as paid
       } else {
         // Add new product with full details
         cart.items.push({
@@ -77,6 +78,7 @@ const handler = async (req, res) => {
           description: product.description,
           price: product.price,
           quantity: 1,
+          paid, // Set paid to true for new items
         });
       }
 
@@ -117,8 +119,35 @@ const handler = async (req, res) => {
       return res
         .status(200)
         .json({ message: "Product removed from cart", items: cart.items });
+    }
+
+    if (req.method === "PUT") {
+      const { productId } = req.body; // Get productId from request body
+
+      // Find the user's cart
+      const cart = await Cart.findOne({ userId });
+      if (!cart) {
+        return res.status(404).json({ message: "Cart not found" });
+      }
+
+      // Find the product in the cart
+      const itemIndex = cart.items.findIndex(
+        (item) => item.productId.toString() === productId
+      );
+
+      if (itemIndex === -1) {
+        return res.status(404).json({ message: "Product not found in cart" });
+      }
+
+      // Update the paid status of the product
+      cart.items[itemIndex].paid = true; // Mark as paid
+
+      await cart.save(); // Save the updated cart to the database
+      return res
+        .status(200)
+        .json({ message: "Product marked as paid", items: cart.items });
     } else {
-      res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+      res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {

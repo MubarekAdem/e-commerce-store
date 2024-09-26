@@ -3,7 +3,12 @@ import React from "react";
 import { useCart } from "../contexts/CartContext";
 
 const Cart = () => {
-  const { cart, removeFromCart, clearCart } = useCart();
+  const { cart, removeFromCart, clearCart, payForItem } = useCart();
+
+  const handlePay = async (productId) => {
+    console.log("Pay button clicked for product:", productId);
+    await payForItem(productId); // Call payForItem and await for it to complete
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-100 min-h-screen">
@@ -22,12 +27,20 @@ const Cart = () => {
                 <p>Price: ${item.price}</p>
                 <p>Description: {item.description}</p>
               </div>
-              <button
-                onClick={() => removeFromCart(item.productId)} // This should work if everything is set correctly
-                className="bg-red-500 text-white p-2 rounded"
-              >
-                Remove
-              </button>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => removeFromCart(item.productId)}
+                  className="bg-red-500 text-white p-2 rounded"
+                >
+                  Remove
+                </button>
+                <button
+                  onClick={() => handlePay(item.productId)} // Call Pay function
+                  className="bg-green-500 text-white p-2 rounded"
+                >
+                  Pay
+                </button>
+              </div>
             </div>
           ))}
           <button

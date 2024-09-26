@@ -9,6 +9,7 @@ const CartItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
+  paid: { type: Boolean, default: false }, // Add "paid" field
 });
 
 const CartSchema = new mongoose.Schema({
