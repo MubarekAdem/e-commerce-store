@@ -1,4 +1,3 @@
-// contexts/CartContext.js
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext"; // Adjust the path as needed
@@ -9,6 +8,7 @@ export const CartProvider = ({ children }) => {
   const { currentUser } = useAuth();
   const [cart, setCart] = useState([]);
 
+  // Fetch cart data when user is authenticated
   const fetchCart = async () => {
     if (!currentUser) return;
 
@@ -24,7 +24,13 @@ export const CartProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setCart(response.data.items);
+
+      // Check if the response contains all carts (admin) or a single user's cart
+      if (isAdmin(currentUser)) {
+        setCart(response.data.carts); // Admin gets all carts
+      } else {
+        setCart(response.data.items); // Regular user gets their items
+      }
     } catch (error) {
       console.error(
         "Error fetching cart:",
@@ -33,10 +39,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Helper function to determine if the current user is an admin
+  const isAdmin = (user) => user?.role === "admin";
+
   useEffect(() => {
     fetchCart(); // Fetch the cart when the user is authenticated
   }, [currentUser]);
 
+  // Add an item to the cart
   const addToCart = async (productId) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -64,6 +74,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Remove an item from the cart
   const removeFromCart = async (productId) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -87,6 +98,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Pay for an item
   const payForItem = async (productId) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -114,13 +126,49 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const clearCart = async () => {
-    // Implement clear cart functionality if needed
+  // Update shipment status for an item
+  const updateShipmentStatus = async (productId, paid, userIdToUpdate) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found, user might not be authenticated.");
+      return;
+    }
+
+    console.log("Updating shipment status:", {
+      productId,
+      paid,
+      userIdToUpdate,
+    }); // Add this line
+
+    try {
+      const response = await axios.put(
+        "/api/cart",
+        { productId, paid, userIdToUpdate },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Response from API:", response.data);
+    } catch (error) {
+      console.error(
+        "Error updating shipment status:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, clearCart, payForItem }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+
+        payForItem,
+        updateShipmentStatus, // Provide updateShipmentStatus function
+      }}
     >
       {children}
     </CartContext.Provider>

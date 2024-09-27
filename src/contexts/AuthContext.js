@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
           },
         });
         if (response.status === 200) {
-          setCurrentUser(response.data.user);
+          setCurrentUser(response.data.user); // Make sure user includes role
         }
       } catch (error) {
         console.error("Failed to fetch current user", error);
@@ -55,8 +55,13 @@ export function AuthProvider({ children }) {
     router.push("/login");
   };
 
+  // Helper function to check if the user is an admin
+  const isAdmin = () => currentUser?.role === "admin";
+
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ currentUser, login, logout, isLoading, isAdmin }}
+    >
       {!isLoading && children} {/* Only render children if not loading */}
     </AuthContext.Provider>
   );

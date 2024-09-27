@@ -1,6 +1,6 @@
 import dbConnect from "../../utils/dbConnect";
 import Cart from "../../models/Cart";
-import Product from "../../models/Product"; // Import your Product model
+import Product from "../../models/Product";
 import jwt from "jsonwebtoken";
 
 const handler = async (req, res) => {
@@ -21,13 +21,20 @@ const handler = async (req, res) => {
     // Verify the token using the same secret used to sign it
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId; // Extract userId from the decoded token
-    if (!userId) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
+
+    // Check if the user is admin (modify this according to your user roles)
+    const isAdmin = decoded.role === "admin"; // Assume your token contains a role
+
+    // Log the decoded values for debugging
+    console.log("Decoded user ID:", userId);
+    console.log("Is Admin:", isAdmin);
 
     if (req.method === "GET") {
-      // Fetch the user's cart
-      const cart = await Cart.findOne({ userId });
+      // Admin can fetch all carts or user can fetch their own
+      const cart = isAdmin
+        ? await Cart.find({}) // Fetch all carts for admin
+        : await Cart.findOne({ userId }); // Regular user fetches their own cart
+
       if (!cart) {
         return res.status(404).json({ message: "Cart not found" });
       }
@@ -35,7 +42,7 @@ const handler = async (req, res) => {
     }
 
     if (req.method === "POST") {
-      const { productId, paid = true } = req.body; // Set paid to true by default
+      const { productId, paid = true } = req.body;
 
       // Fetch product details from the Product model
       const product = await Product.findById(productId);
@@ -55,7 +62,7 @@ const handler = async (req, res) => {
               description: product.description,
               price: product.price,
               quantity: 1,
-              paid, // Use the paid status from the request body
+              paid,
             },
           ],
         });
@@ -78,7 +85,7 @@ const handler = async (req, res) => {
           description: product.description,
           price: product.price,
           quantity: 1,
-          paid, // Set paid to true for new items
+          paid,
         });
       }
 
@@ -89,7 +96,7 @@ const handler = async (req, res) => {
     }
 
     if (req.method === "DELETE") {
-      const { productId } = req.body; // Get productId from request body
+      const { productId } = req.body;
 
       // Find the user's cart
       const cart = await Cart.findOne({ userId });
@@ -122,15 +129,24 @@ const handler = async (req, res) => {
     }
 
     if (req.method === "PUT") {
-      const { productId } = req.body; // Get productId from request body
+      const { productId, paid, userIdToUpdate } = req.body; // Accept userIdToUpdate for admins
 
-      // Find the user's cart
-      const cart = await Cart.findOne({ userId });
+      // Log the request body for debugging
+      console.log("Request body for PUT:", req.body);
+
+      // Admin can update any user's cart, regular users can only update their own
+      const cart = isAdmin
+        ? await Cart.findOne({ userId: userIdToUpdate }) // Admin specifies which user's cart to update
+        : await Cart.findOne({ userId }); // Regular user accesses their own cart
+
       if (!cart) {
+        console.log(
+          `Cart not found for user ID: ${isAdmin ? userIdToUpdate : userId}`
+        );
         return res.status(404).json({ message: "Cart not found" });
       }
 
-      // Find the product in the cart
+      // Find the item in the cart
       const itemIndex = cart.items.findIndex(
         (item) => item.productId.toString() === productId
       );
@@ -140,16 +156,18 @@ const handler = async (req, res) => {
       }
 
       // Update the paid status of the product
-      cart.items[itemIndex].paid = true; // Mark as paid
+      cart.items[itemIndex].paid = paid; // Update the paid status
+      // You can also update shipment status or any other fields as needed
+      cart.items[itemIndex].shipmentStatus = "Shipped"; // Example of updating shipment status
 
       await cart.save(); // Save the updated cart to the database
       return res
         .status(200)
-        .json({ message: "Product marked as paid", items: cart.items });
-    } else {
-      res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
-      return res.status(405).end(`Method ${req.method} Not Allowed`);
+        .json({ message: "Product status updated", items: cart.items });
     }
+
+    res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
   } catch (error) {
     console.error("Error verifying token or cart operation:", error);
     return res.status(401).json({ message: "Invalid or expired token" });

@@ -1,3 +1,4 @@
+// Cart.js (updated model)
 const mongoose = require("mongoose");
 
 const CartItemSchema = new mongoose.Schema({
@@ -9,7 +10,8 @@ const CartItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  paid: { type: Boolean, default: false }, // Add "paid" field
+  paid: { type: Boolean, default: false },
+  shipmentStatus: { type: String, default: "Pending" }, // New field for shipment status
 });
 
 const CartSchema = new mongoose.Schema({

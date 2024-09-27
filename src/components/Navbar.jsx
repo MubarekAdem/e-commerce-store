@@ -1,20 +1,21 @@
+// NavBar.js
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import { useRouter } from "next/router";
 
 const Navbar = () => {
-  const { logout } = useAuth();
-  const { cart } = useCart(); // Get the cart context
+  const { currentUser, logout } = useAuth();
+  const { cart } = useCart();
+
   const router = useRouter();
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login"); // Redirect to login page after logout
+    router.push("/login");
   };
 
-  // If you're just counting the number of items in the cart (assuming no quantity field)
-  const totalItems = cart.length;
+  const totalItems = cart ? cart.length : 0;
 
   return (
     <nav className="bg-gray-800 text-white p-4">
@@ -29,14 +30,16 @@ const Navbar = () => {
             Product List
           </a>
         </li>
-        <li>
-          <a href="/bulk-upload" className="hover:text-gray-300">
-            Bulk Upload
-          </a>
-        </li>
+        {currentUser?.role === "customer" && (
+          <li>
+            <a href="/track-orders" className="hover:text-gray-300">
+              Track Orders
+            </a>
+          </li>
+        )}
         <li>
           <a href="/cart" className="hover:text-gray-300">
-            Cart ({totalItems}) {/* Display total items in cart */}
+            Cart ({totalItems})
           </a>
         </li>
         <li>

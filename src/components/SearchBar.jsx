@@ -25,14 +25,14 @@ const SearchBar = () => {
       }
     };
 
-    const timeoutId = setTimeout(fetchSuggestions, 300); // Debounce
+    const timeoutId = setTimeout(fetchSuggestions, 300);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   const handleSuggestionClick = (name) => {
     setSearchTerm(name);
-    setSuggestions([]); // Clear suggestions after selection
+    setSuggestions([]);
   };
 
   return (

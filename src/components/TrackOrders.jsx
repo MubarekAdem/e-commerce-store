@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 
-const Orders = () => {
+const TrackOrders = () => {
   const [orders, setOrders] = useState([]);
   const { currentUser } = useAuth();
 
@@ -27,29 +27,6 @@ const Orders = () => {
     }
   }, [currentUser]);
 
-  const updateShipmentStatus = async (orderId, status) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        "/api/orders",
-        { orderId, status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      // Update state to reflect the change in UI
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order._id === orderId ? { ...order, shipmentStatus: status } : order
-        )
-      );
-    } catch (error) {
-      console.error("Error updating shipment status:", error);
-    }
-  };
-
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Track Your Orders</h1>
@@ -64,18 +41,6 @@ const Orders = () => {
               <p>Price: ${order.price}</p>
               <p>Quantity: {order.quantity}</p>
               <p>Status: {order.shipmentStatus || "Pending"}</p>
-              <button
-                onClick={() => updateShipmentStatus(order._id, "Shipped")}
-                className="bg-blue-500 text-white p-2 mr-2"
-              >
-                Mark as Shipped
-              </button>
-              <button
-                onClick={() => updateShipmentStatus(order._id, "Delivered")}
-                className="bg-green-500 text-white p-2"
-              >
-                Mark as Delivered
-              </button>
             </div>
           ))}
         </div>
@@ -84,4 +49,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default TrackOrders;
