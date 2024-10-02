@@ -83,7 +83,7 @@ const handler = async (req, res) => {
 
         try {
           const response = await axios.post(
-            "http://localhost:3000/api/products",
+            "/api/products",
             savedProducts
           );
           console.log("Response from /api/products:", response.data);
