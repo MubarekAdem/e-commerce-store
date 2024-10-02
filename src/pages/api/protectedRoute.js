@@ -1,4 +1,4 @@
-import { protect } from "../../../middleware/authMiddleware";
+import { protect } from "../../middleware/authMiddleware";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
