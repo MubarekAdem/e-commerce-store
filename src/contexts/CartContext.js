@@ -57,7 +57,7 @@ export const CartProvider = ({ children }) => {
     try {
       const response = await axios.post(
         "/api/cart",
-        { productId, paid: true }, // Send paid status as true
+
         {
           headers: {
             Authorization: `Bearer ${token}`,

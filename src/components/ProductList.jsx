@@ -41,7 +41,7 @@ const ProductList = () => {
     }
   };
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (product) => {
     try {
       const token = localStorage.getItem("token"); // Get the token from local storage
       if (!token) {
@@ -50,8 +50,8 @@ const ProductList = () => {
 
       // Make sure the Authorization header is correctly set
       const response = await axios.post(
-        "http://localhost:3000/api/cart",
-        { productId },
+        "/api/cart",
+        { productId: product._id }, // Pass the product ID directly
         {
           headers: {
             Authorization: `Bearer ${token}`, // Passing token correctly in the header
@@ -66,6 +66,13 @@ const ProductList = () => {
         error.response?.data || error.message
       );
     }
+  };
+
+  const handleViewReviews = (productId) => {
+    router.push({
+      pathname: "/reviews", // Redirect to the Reviews component
+      query: { productId }, // Pass product ID as query parameter
+    });
   };
 
   return (
@@ -134,12 +141,20 @@ const ProductList = () => {
                       </button>
                     </>
                   ) : (
-                    <button
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                      onClick={() => handleAddToCart(product)} // Use the new function here
-                    >
-                      Add to Cart
-                    </button>
+                    <>
+                      <button
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                        onClick={() => handleAddToCart(product)} // Use the new function here
+                      >
+                        Add to Cart
+                      </button>
+                      <button
+                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors ml-2"
+                        onClick={() => handleViewReviews(product._id)}
+                      >
+                        View Reviews
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

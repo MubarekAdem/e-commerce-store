@@ -42,7 +42,7 @@ const handler = async (req, res) => {
     }
 
     if (req.method === "POST") {
-      const { productId, paid = true } = req.body;
+      const { productId, paid = false } = req.body;
 
       // Fetch product details from the Product model
       const product = await Product.findById(productId);
@@ -76,7 +76,7 @@ const handler = async (req, res) => {
       );
       if (existingProduct) {
         existingProduct.quantity += 1; // Increase quantity if product exists
-        existingProduct.paid = true; // Ensure the existing product is marked as paid
+        // existingProduct.paid = true; // Ensure the existing product is marked as paid
       } else {
         // Add new product with full details
         cart.items.push({
