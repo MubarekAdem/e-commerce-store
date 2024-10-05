@@ -82,7 +82,10 @@ const handler = async (req, res) => {
         console.log("Saved Products to send:", savedProducts);
 
         try {
-          const response = await axios.post("/api/products", savedProducts);
+          const response = await axios.post(
+            "http://localhost:3000/api/products",
+            savedProducts
+          );
           console.log("Response from /api/products:", response.data);
         } catch (error) {
           console.error("Error sending data to /api/products:", error);
