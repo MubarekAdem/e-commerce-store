@@ -1,8 +1,8 @@
 // src/pages/api/products/[id].js
 
-import Product from "../../../models/Product";
-import dbConnect from "../../../utils/dbConnect";
-import { protect } from "../../../middleware/authMiddleware";
+import Product from "../../../../models/Product";
+import dbConnect from "../../../../utils/dbConnect";
+import { protect } from "../../../../middleware/authMiddleware";
 
 export default async function handler(req, res) {
   const { method } = req;
