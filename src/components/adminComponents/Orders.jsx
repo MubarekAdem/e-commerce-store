@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../contexts/AuthContext";
 import { Table, Tag, Button, Typography, notification } from "antd";
+import { useMediaQuery } from "react-responsive";
 
 const { Title } = Typography;
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const { currentUser } = useAuth();
+
+  // Detect screen size for mobile responsiveness
+  const isMobile = useMediaQuery({ query: "(max-width: 767px)" });
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -66,7 +70,8 @@ const Orders = () => {
     }
   };
 
-  const columns = [
+  // Define table columns for desktop
+  const desktopColumns = [
     {
       title: "Order Name",
       dataIndex: "name",
@@ -130,6 +135,63 @@ const Orders = () => {
     },
   ];
 
+  // Define columns for mobile view with simplified information
+  const mobileColumns = [
+    {
+      title: "Order Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price) => `$${price}`,
+    },
+    {
+      title: "Status",
+      dataIndex: "shipmentStatus",
+      key: "shipmentStatus",
+      render: (status) => (
+        <Tag
+          color={
+            status === "Delivered"
+              ? "green"
+              : status === "Shipped"
+              ? "blue"
+              : "orange"
+          }
+        >
+          {status || "Pending"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <div>
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => updateShipmentStatus(record._id, "Shipped")}
+            className="mr-2"
+          >
+            Shipped
+          </Button>
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => updateShipmentStatus(record._id, "Delivered")}
+            danger
+          >
+            Delivered
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <Title level={2} className="mb-4">
@@ -139,10 +201,11 @@ const Orders = () => {
         <p>No orders found.</p>
       ) : (
         <Table
-          columns={columns}
+          columns={isMobile ? mobileColumns : desktopColumns}
           dataSource={orders}
           rowKey="_id"
           pagination={{ pageSize: 5 }}
+          scroll={{ x: isMobile ? 400 : null }} // Enables horizontal scroll on mobile
         />
       )}
     </div>
