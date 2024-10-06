@@ -1,7 +1,7 @@
 // NavBar.js
 import React from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCart } from "../../contexts/CartContext";
 import { useRouter } from "next/router";
 
 const Navbar = () => {

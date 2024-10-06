@@ -1,7 +1,7 @@
 // components/ProductList.jsx
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext"; // Import Cart Context
+import { useAuth } from "../../contexts/AuthContext";
+import { useCart } from "../../contexts/CartContext"; // Import Cart Context
 import { useRouter } from "next/router";
 import axios from "axios";
 

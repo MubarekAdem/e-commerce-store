@@ -1,6 +1,6 @@
 // pages/track-orders.js
 import React from "react";
-import TrackOrders from "../components/TrackOrders";
+import TrackOrders from "../components/userComponents/TrackOrders";
 
 const TrackOrdersPage = () => {
   return <TrackOrders />;

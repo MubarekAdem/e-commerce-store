@@ -1,11 +1,11 @@
-import Navbar from "../components/Navbar";
+import Navbar from "../components/commonComponents/Navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
-import AddProduct from "../components/AddProduct";
-import ProductList from "../components/ProductList";
-import Orders from "../components/Orders"; // Import Orders component
-import SearchBar from "@/components/SearchBar";
+import AddProduct from "../components/adminComponents/AddProduct";
+import ProductList from "../components/commonComponents/ProductList";
+import Orders from "../components/adminComponents/Orders"; // Import Orders component
+import SearchBar from "../components/commonComponents/SearchBar";
 
 const Dashboard = () => {
   const { currentUser } = useAuth();

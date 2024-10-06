@@ -83,12 +83,10 @@ export default async function handler(req, res) {
             .json({ success: false, message: "Comment is required" });
         }
         if (!rating || rating < 1 || rating > 5) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: "Rating must be between 1 and 5",
-            });
+          return res.status(400).json({
+            success: false,
+            message: "Rating must be between 1 and 5",
+          });
         }
 
         // Find the product by ID

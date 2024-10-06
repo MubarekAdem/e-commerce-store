@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
-import { FaStar } from "react-icons/fa"; // Import star icons from react-icons
+import { FaStar } from "react-icons/fa";
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
-  const [hover, setHover] = useState(null); // For star hover effect
+  const [editReviewId, setEditReviewId] = useState(null);
+  const [hover, setHover] = useState(null);
   const { currentUser } = useAuth();
   const router = useRouter();
-  const { productId } = router.query; // Get productId from query parameters
+  const { productId } = router.query;
+
+  const fetchReviews = async () => {
+    if (!productId) return;
+
+    try {
+      const response = await axios.get(`/api/products/${productId}/reviews`);
+      setReviews(response.data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      if (!productId) return; // Return if productId is not available
-
-      try {
-        const response = await axios.get(`/api/products/${productId}/reviews`);
-        setReviews(response.data);
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      }
-    };
-
     fetchReviews();
   }, [productId]);
 
@@ -37,19 +38,52 @@ const Reviews = () => {
     }
 
     try {
-      const res = await axios.post(`/api/products/${productId}/reviews`, {
-        comment,
-        rating,
-        user: {
-          id: currentUser._id, // Ensure you send the user ID
-          email: currentUser.email, // Include the user's email
-        },
-      });
-      setReviews((prev) => [...prev, res.data.review]);
-      setComment(""); // Clear the comment input
-      setRating(0); // Reset the rating
+      if (editReviewId) {
+        // Update the review
+        await axios.put(`/api/products/${productId}/reviews`, {
+          reviewId: editReviewId,
+          comment,
+          rating,
+          userId: currentUser._id,
+        });
+        setEditReviewId(null); // Reset edit mode
+      } else {
+        // Create a new review
+        const res = await axios.post(`/api/products/${productId}/reviews`, {
+          comment,
+          rating,
+          user: {
+            id: currentUser._id,
+            email: currentUser.email,
+          },
+        });
+        setReviews((prev) => [...prev, res.data.review]);
+      }
+
+      setComment("");
+      setRating(0);
+      fetchReviews(); // Refresh the reviews after submitting
     } catch (error) {
       console.error("Error submitting review:", error);
+    }
+  };
+
+  const handleEdit = (review) => {
+    router.push(`/api/products/${productId}/reviews/${review._id}/edit`);
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      const res = await axios.delete(`/api/products/${productId}/reviews`, {
+        data: {
+          reviewId,
+          userId: currentUser._id, // Include user ID for authorization
+        },
+      });
+      console.log("Review deleted:", res.data);
+      fetchReviews(); // Refresh the reviews after deletion
+    } catch (error) {
+      console.error("Error deleting review:", error);
     }
   };
 
@@ -63,7 +97,7 @@ const Reviews = () => {
             htmlFor="comment"
             className="block text-lg font-medium text-gray-700"
           >
-            Leave a Comment
+            {editReviewId ? "Edit Your Review" : "Leave a Comment"}
           </label>
           <textarea
             id="comment"
@@ -84,7 +118,6 @@ const Reviews = () => {
           <div className="flex space-x-2 mt-2">
             {[...Array(5)].map((_, index) => {
               const currentRating = index + 1;
-
               return (
                 <FaStar
                   key={index}
@@ -107,7 +140,7 @@ const Reviews = () => {
           type="submit"
           className="px-6 py-3 mt-4 bg-blue-600 text-white text-lg rounded-md hover:bg-blue-700 transition duration-300"
         >
-          Submit Review
+          {editReviewId ? "Update Review" : "Submit Review"}
         </button>
       </form>
 
@@ -142,6 +175,22 @@ const Reviews = () => {
                 </span>
               </div>
               <p className="text-gray-600">{review.comment}</p>
+              {currentUser && currentUser._id === review.user.id && (
+                <div className="flex space-x-4 mt-2">
+                  <button
+                    onClick={() => handleEdit(review)}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteReview(review._id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
