@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         }
 
         const review = {
-          user,
+          user: user.id, // Ensure this is the user ID
           comment,
           rating,
           createdAt: new Date(),
@@ -59,8 +59,12 @@ export default async function handler(req, res) {
           return res.status(404).json({ message: "Review not found" });
         }
 
-        // Make sure the user trying to edit is the one who created the review
-        if (review.user.toString() !== userId) {
+        console.log("User ID from request:", userId); // Log the userId from the request
+        console.log("Review user ID:", review.user.id.toString()); // Log the user ID from the review
+
+        // Update the comparison to use review.user.id
+        if (review.user.id.toString() !== userId) {
+          console.error("Unauthorized access attempt");
           return res.status(403).json({ message: "Unauthorized" });
         }
 

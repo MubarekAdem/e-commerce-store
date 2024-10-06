@@ -1,140 +1,115 @@
-// src/pages/api/products/[id].js
-
-import Product from "../../../../models/Product";
+// pages/api/products/[id]/reviews.js
 import dbConnect from "../../../../utils/dbConnect";
-import { protect } from "../../../../middleware/authMiddleware";
+import Product from "../../../../models/Product";
 
 export default async function handler(req, res) {
+  await dbConnect();
+
   const { method } = req;
   const { id } = req.query;
-
-  await dbConnect();
 
   switch (method) {
     case "GET":
       try {
         const product = await Product.findById(id);
         if (!product) {
-          return res
-            .status(404)
-            .json({ success: false, message: "Product not found" });
+          return res.status(404).json({ message: "Product not found" });
         }
-        res.status(200).json(product);
+        return res.status(200).json(product.reviews || []);
       } catch (error) {
-        res
-          .status(400)
-          .json({ success: false, message: "Error fetching product" });
+        return res.status(500).json({ error: "Error fetching reviews" });
       }
-      break;
 
-    case "PUT":
+    case "POST":
       try {
-        const product = await Product.findByIdAndUpdate(id, req.body, {
-          new: true,
-          runValidators: true,
-        });
-        if (!product) {
-          return res
-            .status(404)
-            .json({ success: false, message: "Product not found" });
-        }
-        res.status(200).json(product);
-      } catch (error) {
-        res
-          .status(400)
-          .json({ success: false, message: "Error updating product" });
-      }
-      break;
-
-    case "DELETE":
-      try {
-        const deletedProduct = await Product.findByIdAndDelete(id);
-        if (!deletedProduct) {
-          return res
-            .status(404)
-            .json({ success: false, message: "Product not found" });
-        }
-        res
-          .status(200)
-          .json({ success: true, message: "Product deleted successfully" });
-      } catch (error) {
-        res
-          .status(400)
-          .json({ success: false, message: "Error deleting product" });
-      }
-      break;
-
-    case "POST": // Handle review submission
-      await protect(req, res); // Protect the route with JWT authentication
-
-      if (!req.user || !req.user._id || !req.user.email) {
-        return res
-          .status(401)
-          .json({ success: false, message: "User not authenticated" });
-      }
-
-      try {
-        const { comment, rating } = req.body;
-
-        // Validate rating and comment
-        if (!comment || typeof comment !== "string" || comment.trim() === "") {
-          return res
-            .status(400)
-            .json({ success: false, message: "Comment is required" });
-        }
-        if (!rating || rating < 1 || rating > 5) {
-          return res.status(400).json({
-            success: false,
-            message: "Rating must be between 1 and 5",
-          });
-        }
-
-        // Find the product by ID
+        const { comment, rating, user } = req.body;
         const product = await Product.findById(id);
+
         if (!product) {
-          return res
-            .status(404)
-            .json({ success: false, message: "Product not found" });
+          return res.status(404).json({ message: "Product not found" });
         }
 
-        // Check if the user already reviewed the product
-        const alreadyReviewed = product.reviews.some(
-          (r) => r.user.id.toString() === req.user._id.toString()
-        );
-        if (alreadyReviewed) {
-          return res.status(400).json({
-            success: false,
-            message: "You have already reviewed this product",
-          });
-        }
-
-        // Create a new review object
         const review = {
-          user: {
-            id: req.user._id, // User's ID
-            email: req.user.email, // User's email
-          },
+          user,
           comment,
           rating,
           createdAt: new Date(),
         };
 
-        // Add the review to the product's reviews array
         product.reviews.push(review);
         await product.save();
 
-        res.status(201).json({ success: true, review });
+        return res.status(201).json({ review });
       } catch (error) {
-        console.error(error);
-        res
-          .status(500)
-          .json({ success: false, message: "Error submitting review" });
+        console.error("Error submitting review:", error);
+        return res.status(500).json({ error: error.message });
       }
-      break;
+
+    case "PUT": // Handle review editing
+      try {
+        const { reviewId, comment, rating, userId } = req.body;
+
+        const product = await Product.findById(id);
+        if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+        }
+
+        const review = product.reviews.id(reviewId);
+        if (!review) {
+          return res.status(404).json({ message: "Review not found" });
+        }
+
+        // Make sure the user trying to edit is the one who created the review
+        if (review.user.toString() !== userId) {
+          return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        // Update the review with new data
+        review.comment = comment || review.comment;
+        review.rating = rating || review.rating;
+
+        await product.save();
+
+        return res
+          .status(200)
+          .json({ message: "Review updated successfully", review });
+      } catch (error) {
+        console.error("Error updating review:", error);
+        return res.status(500).json({ error: error.message });
+      }
+
+    case "DELETE": // Delete review
+      try {
+        const { reviewId, userId } = req.body;
+
+        const product = await Product.findById(id);
+        if (!product) {
+          return res.status(404).json({ message: "Product not found" });
+        }
+
+        const reviewIndex = product.reviews.findIndex(
+          (review) => review._id.toString() === reviewId
+        );
+
+        // Check if review exists and compare user IDs
+        if (
+          reviewIndex === -1 ||
+          product.reviews[reviewIndex].user.id.toString() !== userId
+        ) {
+          return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        // Remove the review using splice
+        product.reviews.splice(reviewIndex, 1);
+        await product.save();
+
+        return res.status(200).json({ message: "Review deleted" });
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        return res.status(500).json({ error: error.message });
+      }
 
     default:
-      res.setHeader("Allow", ["GET", "PUT", "DELETE", "POST"]);
-      res.status(405).end(`Method ${method} Not Allowed`);
-      break;
+      return res.status(405).json({ message: "Method not allowed" });
   }
 }

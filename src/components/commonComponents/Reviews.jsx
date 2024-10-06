@@ -40,13 +40,16 @@ const Reviews = () => {
     try {
       if (editReviewId) {
         // Update the review
-        await axios.put(`/api/products/${productId}/reviews`, {
-          reviewId: editReviewId,
+        const response = await axios.put(`/api/products/${productId}/reviews`, {
+          reviewId: editReviewId, // ID of the review being edited
           comment,
           rating,
-          userId: currentUser._id,
+          userId: currentUser._id, // Include user ID for authorization
         });
-        setEditReviewId(null); // Reset edit mode
+        console.log("Edit response:", response.data);
+
+        // Reset after successful edit
+        setEditReviewId(null);
       } else {
         // Create a new review
         const res = await axios.post(`/api/products/${productId}/reviews`, {
@@ -64,12 +67,11 @@ const Reviews = () => {
       setRating(0);
       fetchReviews(); // Refresh the reviews after submitting
     } catch (error) {
-      console.error("Error submitting review:", error);
+      console.error(
+        "Error submitting review:",
+        error.response?.data || error.message
+      );
     }
-  };
-
-  const handleEdit = (review) => {
-    router.push(`/api/products/${productId}/reviews/${review._id}/edit`);
   };
 
   const handleDeleteReview = async (reviewId) => {
@@ -178,11 +180,16 @@ const Reviews = () => {
               {currentUser && currentUser._id === review.user.id && (
                 <div className="flex space-x-4 mt-2">
                   <button
-                    onClick={() => handleEdit(review)}
+                    onClick={() => {
+                      setEditReviewId(review._id); // Set the edit review ID
+                      setComment(review.comment); // Set the comment to the current review comment
+                      setRating(review.rating); // Set the rating to the current review rating
+                    }}
                     className="text-blue-600 hover:underline"
                   >
                     Edit
                   </button>
+
                   <button
                     onClick={() => handleDeleteReview(review._id)}
                     className="text-red-600 hover:underline"
