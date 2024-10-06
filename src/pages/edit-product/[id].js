@@ -1,6 +1,6 @@
 // File: pages/edit-product/[id].js
 import { useRouter } from "next/router";
-import EditItem from "../../components/EditItem";
+import EditItem from "../../components/adminComponents/EditItem";
 
 const EditProductPage = () => {
   const router = useRouter();

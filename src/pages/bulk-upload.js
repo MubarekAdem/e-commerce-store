@@ -1,5 +1,5 @@
 import React from "react";
-import BulkUpload from "../components/BulkUpload";
+import BulkUpload from "../components/adminComponents/BulkUpload";
 
 const BulkUploadPage = () => {
   return (
