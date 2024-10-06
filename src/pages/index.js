@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
+// import "antd/dist/antd.min.css"; // For production use
 
 export default function HomePage() {
   const { currentUser } = useAuth();

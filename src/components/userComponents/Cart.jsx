@@ -1,20 +1,49 @@
-// src/pages/cart.js
 import React from "react";
 import { useCart } from "../../contexts/CartContext";
+import { Button, notification, Space, Typography } from "antd";
+import {
+  ShoppingCartOutlined,
+  DeleteOutlined,
+  PayCircleOutlined,
+} from "@ant-design/icons";
+
+const { Title, Paragraph } = Typography;
 
 const Cart = () => {
   const { cart, removeFromCart, clearCart, payForItem } = useCart();
 
   const handlePay = async (productId) => {
     console.log("Pay button clicked for product:", productId);
-    await payForItem(productId); // Call payForItem and await for it to complete
+    await payForItem(productId);
+    notification.success({
+      message: "Payment Successful",
+      description: `You have successfully paid for the product with ID: ${productId}`,
+    });
+  };
+
+  const handleRemove = (productId) => {
+    removeFromCart(productId);
+    notification.warning({
+      message: "Product Removed",
+      description: `The product has been removed from your cart.`,
+    });
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    notification.info({
+      message: "Cart Cleared",
+      description: `All items have been removed from your cart.`,
+    });
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+      <Title level={2} className="mb-4">
+        <ShoppingCartOutlined /> Your Cart
+      </Title>
       {cart.length === 0 ? (
-        <p className="text-gray-600">Your cart is empty.</p>
+        <Paragraph className="text-gray-600">Your cart is empty.</Paragraph>
       ) : (
         <div>
           {cart.map((item) => (
@@ -23,32 +52,39 @@ const Cart = () => {
               className="flex justify-between items-center p-4 border-b"
             >
               <div>
-                <h2 className="text-lg font-semibold">{item.name}</h2>
-                <p>Price: ${item.price}</p>
-                <p>Description: {item.description}</p>
+                <Title level={4} className="text-lg font-semibold">
+                  {item.name}
+                </Title>
+                <Paragraph>Price: ${item.price}</Paragraph>
+                <Paragraph>Description: {item.description}</Paragraph>
               </div>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => removeFromCart(item.productId)}
-                  className="bg-red-500 text-white p-2 rounded"
+              <Space>
+                <Button
+                  type="primary"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleRemove(item.productId)}
                 >
                   Remove
-                </button>
-                <button
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<PayCircleOutlined />}
                   onClick={() => handlePay(item.productId)} // Call Pay function
-                  className="bg-green-500 text-white p-2 rounded"
                 >
                   Pay
-                </button>
-              </div>
+                </Button>
+              </Space>
             </div>
           ))}
-          <button
-            onClick={clearCart}
-            className="bg-blue-500 text-white p-2 rounded mt-4"
+          <Button
+            type="default"
+            onClick={handleClearCart}
+            className="mt-4"
+            style={{ backgroundColor: "#1890ff", color: "#fff" }}
           >
             Clear Cart
-          </button>
+          </Button>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
-// Cart.js (updated model)
-const mongoose = require("mongoose");
+// models/Cart.js
+import mongoose from "mongoose";
 
 const CartItemSchema = new mongoose.Schema({
   productId: {
@@ -19,4 +19,6 @@ const CartSchema = new mongoose.Schema({
   items: [CartItemSchema],
 });
 
-module.exports = mongoose.models.Cart || mongoose.model("Cart", CartSchema);
+const Cart = mongoose.models.Cart || mongoose.model("Cart", CartSchema);
+
+export default Cart; // Use default export

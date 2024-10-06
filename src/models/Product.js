@@ -1,6 +1,5 @@
 // src/models/Product.js
-
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ReviewSchema = new mongoose.Schema({
   user: {
@@ -23,5 +22,8 @@ const ProductSchema = new mongoose.Schema({
   reviews: [ReviewSchema], // Ensure this is defined here
 });
 
-module.exports =
+// Use default export
+const Product =
   mongoose.models.Product || mongoose.model("Product", ProductSchema);
+
+export default Product;

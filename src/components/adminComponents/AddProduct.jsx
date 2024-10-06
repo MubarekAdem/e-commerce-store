@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Form, Input, Button, Typography, Space, notification } from "antd";
+
+const { Title } = Typography;
 
 const AddProduct = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [stock, setStock] = useState(0);
+  const [form] = Form.useForm();
   const [variants, setVariants] = useState([{ size: "", color: "", stock: 0 }]);
 
-  const handleVariantChange = (index, e) => {
-    const { name, value } = e.target;
+  const handleVariantChange = (index, field, value) => {
     const newVariants = [...variants];
-    newVariants[index][name] = value;
+    newVariants[index][field] = value;
     setVariants(newVariants);
   };
 
@@ -20,9 +18,10 @@ const AddProduct = () => {
     setVariants([...variants, { size: "", color: "", stock: 0 }]);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     try {
+      const { name, description, price, imageUrl, stock } = values;
+
       const response = await axios.post("/api/products", {
         name,
         description,
@@ -31,152 +30,119 @@ const AddProduct = () => {
         stock,
         variants,
       });
-      console.log("Product added:", response.data);
+
+      notification.success({
+        message: "Product Added",
+        description: "Your product has been added successfully!",
+      });
+
+      // Reset the form and variants
+      form.resetFields();
+      setVariants([{ size: "", color: "", stock: 0 }]);
     } catch (error) {
-      console.error(
-        "Error adding product:",
-        error.response?.data || error.message
-      );
+      console.error("Error adding product:", error);
+      notification.error({
+        message: "Error",
+        description: "There was an issue adding the product. Please try again.",
+      });
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
-      <form onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-semibold mb-4">Add New Product</h2>
+      <Title level={2} className="text-center mb-4">
+        Add New Product
+      </Title>
+      <Form form={form} onFinish={handleSubmit} layout="vertical">
+        <Form.Item
+          name="name"
+          label="Name"
+          rules={[{ required: true, message: "Please enter the product name" }]}
+        >
+          <Input placeholder="Product Name" />
+        </Form.Item>
 
-        <div className="mb-4">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Name:
-          </label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+        <Form.Item
+          name="description"
+          label="Description"
+          rules={[
+            { required: true, message: "Please enter the product description" },
+          ]}
+        >
+          <Input placeholder="Product Description" />
+        </Form.Item>
 
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Description:
-          </label>
-          <input
-            type="text"
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+        <Form.Item
+          name="price"
+          label="Price"
+          rules={[
+            { required: true, message: "Please enter the product price" },
+          ]}
+        >
+          <Input type="number" placeholder="Product Price" />
+        </Form.Item>
 
-        <div className="mb-4">
-          <label
-            htmlFor="price"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Price:
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+        <Form.Item
+          name="imageUrl"
+          label="Image URL"
+          rules={[{ required: true, message: "Please enter the image URL" }]}
+        >
+          <Input placeholder="Image URL" />
+        </Form.Item>
 
-        <div className="mb-4">
-          <label
-            htmlFor="imageUrl"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Image URL:
-          </label>
-          <input
-            type="text"
-            id="imageUrl"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
+        <Form.Item
+          name="stock"
+          label="Stock"
+          rules={[
+            { required: true, message: "Please enter the product stock" },
+          ]}
+        >
+          <Input type="number" placeholder="Product Stock" />
+        </Form.Item>
 
-        <div className="mb-4">
-          <label
-            htmlFor="stock"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Stock:
-          </label>
-          <input
-            type="number"
-            id="stock"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-
-        <h3 className="text-lg font-semibold mb-2">Variants:</h3>
+        <Title level={4} className="mb-4">
+          Variants
+        </Title>
         {variants.map((variant, index) => (
-          <div key={index} className="mb-4">
-            <input
-              type="text"
+          <Space key={index} direction="vertical" className="mb-2 w-full">
+            <Input
               placeholder="Size"
-              name="size"
               value={variant.size}
-              onChange={(e) => handleVariantChange(index, e)}
-              className="w-full p-2 border rounded mb-2"
-              required
+              onChange={(e) =>
+                handleVariantChange(index, "size", e.target.value)
+              }
+              className="w-full"
             />
-            <input
-              type="text"
+            <Input
               placeholder="Color"
-              name="color"
               value={variant.color}
-              onChange={(e) => handleVariantChange(index, e)}
-              className="w-full p-2 border rounded mb-2"
-              required
+              onChange={(e) =>
+                handleVariantChange(index, "color", e.target.value)
+              }
+              className="w-full"
             />
-            <input
+            <Input
               type="number"
               placeholder="Stock"
-              name="stock"
               value={variant.stock}
-              onChange={(e) => handleVariantChange(index, e)}
-              className="w-full p-2 border rounded mb-2"
-              required
+              onChange={(e) =>
+                handleVariantChange(index, "stock", e.target.value)
+              }
+              className="w-full"
             />
-          </div>
+          </Space>
         ))}
-        <button
-          type="button"
-          onClick={addVariant}
-          className="mt-2 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
-          Add Variant
-        </button>
 
-        <button
-          type="submit"
-          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Add Product
-        </button>
-      </form>
+        <Button type="dashed" onClick={addVariant} className="w-full mb-4">
+          Add Variant
+        </Button>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="w-full">
+            Add Product
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };

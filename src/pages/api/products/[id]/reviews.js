@@ -20,28 +20,33 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "Error fetching reviews" });
       }
 
-    case "POST":
+    case "POST": // Handle review creation
       try {
-        const { comment, rating, user } = req.body;
-        const product = await Product.findById(id);
+        const { comment, rating, user } = req.body; // Ensure user is being destructured
 
+        const product = await Product.findById(id);
         if (!product) {
           return res.status(404).json({ message: "Product not found" });
         }
 
-        const review = {
-          user: user.id, // Ensure this is the user ID
+        // Create a new review object
+        const newReview = {
           comment,
           rating,
-          createdAt: new Date(),
+          user: {
+            id: user.id, // Save the user ID correctly
+            email: user.email, // Save the user email if needed
+          },
         };
 
-        product.reviews.push(review);
+        product.reviews.push(newReview);
         await product.save();
 
-        return res.status(201).json({ review });
+        return res
+          .status(201)
+          .json({ message: "Review created successfully", review: newReview });
       } catch (error) {
-        console.error("Error submitting review:", error);
+        console.error("Error creating review:", error);
         return res.status(500).json({ error: error.message });
       }
 

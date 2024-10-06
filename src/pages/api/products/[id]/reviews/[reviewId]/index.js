@@ -1,5 +1,5 @@
 // pages/api/products/[id]/reviews.js
-import connectDb from "../../../../../../utils/connectDb";
+import connectDb from "../../../../../../utils/dbConnect";
 import Product from "../../../../../../models/Product";
 
 connectDb();

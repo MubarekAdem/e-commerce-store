@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { Form, Input, Button, Select, Typography, notification } from "antd";
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,85 +15,102 @@ const Register = () => {
   });
   const router = useRouter();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (name) => (value) => {
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleLogin = () => {
-    router.push("/login"); // Redirect to the registration page
+    router.push("/login"); // Redirect to the login page
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     try {
-      const response = await axios.post("/api/auth/signup", formData);
+      const response = await axios.post("/api/auth/signup", values);
       localStorage.setItem("authToken", response.data.token);
+      notification.success({
+        message: "Registration Successful",
+        description: "You have been registered successfully!",
+      });
       router.push("/dashboard");
     } catch (error) {
       console.error(
         "Error registering:",
         error.response?.data || error.message
       );
+      notification.error({
+        message: "Registration Failed",
+        description: error.response?.data?.message || "Please try again.",
+      });
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
+      <Title level={2} className="text-center mb-4">
+        Register
+      </Title>
+      <Form onFinish={handleSubmit}>
+        <Form.Item
           name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-          required
-        />
-        <input
-          type="email"
+          rules={[{ required: true, message: "Please input your name!" }]}
+        >
+          <Input
+            placeholder="Name"
+            value={formData.name}
+            onChange={(e) => handleChange("name")(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
           name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-          required
-        />
-        <input
-          type="password"
+          rules={[
+            {
+              required: true,
+              type: "email",
+              message: "Please enter a valid email!",
+            },
+          ]}
+        >
+          <Input
+            placeholder="Email"
+            value={formData.email}
+            onChange={(e) => handleChange("email")(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
           name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-          required
-        />
-        <select
+          rules={[{ required: true, message: "Please input your password!" }]}
+        >
+          <Input.Password
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) => handleChange("password")(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item
           name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-          required
+          rules={[{ required: true, message: "Please select your role!" }]}
         >
-          <option value="customer">Customer</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button
-          type="submit"
-          className="w-full p-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Register
-        </button>
-      </form>
-      <p className="mt-4">
+          <Select
+            placeholder="Select your role"
+            value={formData.role}
+            onChange={handleChange("role")}
+          >
+            <Option value="customer">Customer</Option>
+            <Option value="admin">Admin</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="w-full">
+            Register
+          </Button>
+        </Form.Item>
+      </Form>
+      <Text className="mt-4 block text-center">
         Already have an account?{" "}
-        <button
-          onClick={handleLogin}
-          className="text-blue-500 hover:underline focus:outline-none"
-        >
+        <Button type="link" onClick={handleLogin} className="p-0">
           Login
-        </button>
-      </p>
+        </Button>
+      </Text>
     </div>
   );
 };
