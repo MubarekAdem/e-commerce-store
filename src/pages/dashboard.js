@@ -69,7 +69,6 @@ const Dashboard = () => {
             <>
               <h2>Admin Dashboard</h2>
               <AddProduct />
-              <Orders /> {/* Show Orders component for Admin */}
             </>
           )}
 
@@ -80,9 +79,7 @@ const Dashboard = () => {
                 // position: "relative", // Ensures the product list is part of the layout flow
               }
             }
-          >
-            <ProductList />
-          </div>
+          ></div>
         </Content>
       </Layout>
     </Layout> // zIndex: 500, // Set a lower z-index than the search bar

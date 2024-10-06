@@ -4,7 +4,7 @@ import {
   DashboardOutlined,
   ShoppingCartOutlined,
   OrderedListOutlined,
-  BarsOutlined, // New icon
+  BarsOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
@@ -45,11 +45,16 @@ const Navbar = () => {
             <a href="/dashboard">Dashboard</a>
           </Menu.Item>
           <Menu.Item key="2" icon={<OrderedListOutlined />}>
-            <a href="/productlist">Product List</a>
+            <a href="/product-list">Product List</a>
           </Menu.Item>
           {currentUser?.role === "customer" && (
             <Menu.Item key="3" icon={<OrderedListOutlined />}>
               <a href="/track-orders">Track Orders</a>
+            </Menu.Item>
+          )}
+          {currentUser?.role === "admin" && (
+            <Menu.Item key="6" icon={<OrderedListOutlined />}>
+              <a href="/orders">Orders</a> {/* Admin-only Orders Menu */}
             </Menu.Item>
           )}
           <Menu.Item key="4" icon={<ShoppingCartOutlined />}>
@@ -75,13 +80,13 @@ const Navbar = () => {
         <Button
           type="primary"
           onClick={showDrawer}
-          icon={<BarsOutlined />} // Updated icon
+          icon={<BarsOutlined />}
           style={{
-            position: "fixed", // Make the button fixed
-            top: 16, // Position it 16px from the top
-            left: 16, // Position it 16px from the left
-            zIndex: 1000, // Ensure it stays on top
-            backgroundColor: "#1890ff", // Custom button color (optional)
+            position: "fixed",
+            top: 16,
+            left: 16,
+            zIndex: 1000,
+            backgroundColor: "#1890ff",
           }}
         />
         <Drawer
@@ -99,11 +104,16 @@ const Navbar = () => {
               <a href="/dashboard">Dashboard</a>
             </Menu.Item>
             <Menu.Item key="2" icon={<OrderedListOutlined />}>
-              <a href="/productlist">Product List</a>
+              <a href="/product-list">Product List</a>
             </Menu.Item>
             {currentUser?.role === "customer" && (
               <Menu.Item key="3" icon={<OrderedListOutlined />}>
                 <a href="/track-orders">Track Orders</a>
+              </Menu.Item>
+            )}
+            {currentUser?.role === "admin" && (
+              <Menu.Item key="6" icon={<OrderedListOutlined />}>
+                <a href="/orders">Orders</a> {/* Admin-only Orders Menu */}
               </Menu.Item>
             )}
             <Menu.Item key="4" icon={<ShoppingCartOutlined />}>

@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* styles/globals.css */
+
+/* Dark mode background and color palette */
+body.dark-mode {
+  background-color: #121212 !important; /* Darker background for the whole page */
+  color: #e0e0e0 !important; /* Light text for readability */
+}
+
+body.dark-mode .ant-layout,
+body.dark-mode .ant-menu,
+body.dark-mode .ant-table,
+body.dark-mode .ant-btn,
+body.dark-mode .ant-input,
+body.dark-mode .ant-drawer,
+body.dark-mode .ant-card {
+  background-color: #1e1e1e !important; /* Soft dark background for components */
+  color: #e0e0e0 !important; /* Light text on all components */
+  border-color: #333333 !important; /* Subtle dark borders */
+}
+
+body.dark-mode .ant-btn-primary {
+  background-color: #5c5c5c !important; /* Primary buttons with a softer color */
+  color: #ffffff !important; /* White text on buttons */
+}
+
+body.dark-mode .ant-input,
+body.dark-mode .ant-input-affix-wrapper,
+body.dark-mode .ant-select-selector {
+  background-color: #333333 !important; /* Dark background for inputs and selectors */
+  border-color: #444444 !important; /* Darker border for inputs */
+  color: #e0e0e0 !important; /* Light text inside inputs */
+}
+
+body.dark-mode .ant-menu-item-selected {
+  background-color: #3a3a3a !important; /* Softer background for selected menu items */
+}
+
+body.dark-mode .ant-table-thead > tr > th {
+  background-color: #2a2a2a !important; /* Darker table headers */
+  color: #e0e0e0 !important; /* Lighter header text */
+}
+
+body.dark-mode .ant-table-tbody > tr > td {
+  background-color: #1e1e1e !important; /* Darker table body */
+  color: #e0e0e0 !important; /* Lighter text in table body */
+}

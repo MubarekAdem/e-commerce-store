@@ -1,6 +1,6 @@
 import Register from "../components/commonComponents/Register";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   return (
     <div>
       <Register />
