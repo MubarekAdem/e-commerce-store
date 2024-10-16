@@ -23,7 +23,6 @@ const Contact = () => {
       `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
     )}`;
 
-    // Open the user's email client
     window.location.href = mailtoLink;
   };
 
@@ -40,7 +39,6 @@ const Contact = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Contact Form Section */}
           <div className="bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
               Get in Touch
@@ -106,7 +104,6 @@ const Contact = () => {
             </form>
           </div>
 
-          {/* Contact Info Section */}
           <div className="bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
               Contact Information

@@ -6,19 +6,17 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
-  // Check if the JWT token is present in localStorage
   useEffect(() => {
-    const token = localStorage.getItem("jwtToken"); // Or replace with the token key you're using
+    const token = localStorage.getItem("jwtToken");
     if (token) {
       setIsLoggedIn(true);
     }
   }, []);
 
-  // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken"); // Remove JWT from localStorage
+    localStorage.removeItem("jwtToken");
     setIsLoggedIn(false);
-    router.push("/login"); // Redirect to login page
+    router.push("/login");
   };
 
   return (

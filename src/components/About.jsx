@@ -15,7 +15,6 @@ const About = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Mission Section */}
           <div className="flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDJcxbRwfg-z1Kc4pqouaUU-IjiQn8CiVqIQ&s"
@@ -32,7 +31,6 @@ const About = () => {
             </p>
           </div>
 
-          {/* Values Section */}
           <div className="flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5EZMD8xsuDwXoTbHf0k4mWaoqf3cuCYWe-w&s"
@@ -49,7 +47,6 @@ const About = () => {
             </p>
           </div>
 
-          {/* Team Section */}
           <div className="flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <img
               src="https://static.vecteezy.com/system/resources/previews/009/663/166/non_2x/people-user-team-transparent-free-png.png"
@@ -66,7 +63,6 @@ const About = () => {
             </p>
           </div>
 
-          {/* Vision Section */}
           <div className="flex flex-col justify-center items-center bg-white shadow-lg rounded-lg p-8 transform transition duration-500 hover:scale-105 hover:shadow-xl">
             <img
               src="https://png.pngtree.com/png-vector/20221221/ourmid/pngtree-realistic-best-quality-badge-with-round-shape-gold-color-png-image_6532360.png"
